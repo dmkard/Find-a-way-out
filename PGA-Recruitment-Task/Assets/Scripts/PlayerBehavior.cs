@@ -20,10 +20,6 @@ public class PlayerBehavior : MonoBehaviour
     private float _yRotationInput = 0.0f;
     private float _yRotation = 0.0f;
 
-    private void Start()
-    {
-    }
-
     private void Update()
     {
         //update position and roration of player only if game is not on pause
