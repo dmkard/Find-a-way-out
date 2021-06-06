@@ -9,6 +9,7 @@ public class GameBehavior : MonoBehaviour
     public GameObject doorFrame;
     public GameObject chest;
     public GameObject keycard;
+    public GameObject dialogBox;
 
     public Camera cam;
 
@@ -18,16 +19,18 @@ public class GameBehavior : MonoBehaviour
     private bool _keyPicked;
     private GameObject _currentActiveObject;
 
+    enum DialogType { CHESTOPENED = 1, KEYPICKED = 2, DOOROPENED = 3 };
+    private DialogType _currentDialog = 0;
+
 
     private void Start()
     {
-        StartGame();
+        PauseGame();
     }
     // Start is called before the first frame update
     public void StartGame()
     {
-
-        //Cursor.lockState = CursorLockMode.Locked;
+        UnpauseGame();
         _doorOpened = false;
         _chestOpened = false;
         _keyPicked = false;
@@ -100,6 +103,7 @@ public class GameBehavior : MonoBehaviour
                 if (isMouseClickAction)
                 {
                     _currentActiveObject = objectHit.transform.gameObject;
+
                 }
             }
 
@@ -108,6 +112,7 @@ public class GameBehavior : MonoBehaviour
                 if (isMouseClickAction)
                 {
                     _currentActiveObject = objectHit.transform.gameObject;
+                    dialogBox.GetComponent<DialogManager>().ShowDialogBox("Open?", 2, "Yes", "No");
                 }
             }
             if (!_doorOpened && objectHit.transform.gameObject.name == "Keycard(Clone)")
@@ -123,14 +128,14 @@ public class GameBehavior : MonoBehaviour
 
     public void PauseGame()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         _isGameOnPause = true;
     }
 
     public void UnpauseGame()
     {
-        Cursor.lockState = CursorLockMode.None;
+        Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         _isGameOnPause = false;
     }
@@ -138,5 +143,19 @@ public class GameBehavior : MonoBehaviour
     public bool IsGameOnPause()
     {
         return _isGameOnPause;
+    }
+
+    public void handleDoalog()
+    {
+        switch (_currentDialog)
+        {
+            case DialogType.CHESTOPENED:
+                break;
+            case DialogType.KEYPICKED:
+                break;
+            case DialogType.DOOROPENED:
+                break;
+        }
+
     }
 }
