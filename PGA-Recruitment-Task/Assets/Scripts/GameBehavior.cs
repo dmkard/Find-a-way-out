@@ -13,7 +13,7 @@ public class GameBehavior : MonoBehaviour
 
     public Camera cam;
 
-    private bool _isGameOnPause = false;
+    private bool _isGameOnPause;
     private bool _doorOpened;
     private bool _chestOpened;
     private bool _keyPicked;
@@ -77,13 +77,16 @@ public class GameBehavior : MonoBehaviour
 
             if (!hasCollision)
             {
-                Instantiate(chest, spawnPosition, Quaternion.identity);
+                if (spawnPosition.z > 0)
+                    Instantiate(chest, spawnPosition, Quaternion.Euler(0, 180, 0));
+                else
+                    Instantiate(chest, spawnPosition, Quaternion.identity);
+
                 Instantiate(keycard, spawnPosition + new Vector3(0f, 0.15f, 0f), Quaternion.Euler(-90,90,0));
             }
         }
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         if(!_isGameOnPause)
@@ -96,30 +99,47 @@ public class GameBehavior : MonoBehaviour
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
         Physics.Raycast(ray, out objectHit);
 
-        if(objectHit.distance < 2)
+        if(objectHit.distance < 3)
         {
             if (!_doorOpened && objectHit.transform.gameObject.name == "Door")
             {
                 if (isMouseClickAction)
                 {
-                    _currentActiveObject = objectHit.transform.gameObject;
-
+                    PauseGame();
+                    if (_keyPicked)
+                    {
+                        _currentDialog = DialogType.DOOROPENED;
+                        _currentActiveObject = objectHit.transform.gameObject;
+                        dialogBox.GetComponent<DialogManager>().ShowDialogBox("Open?", 2, "Yes", "No");
+                    }
+                    else
+                    {
+                        dialogBox.GetComponent<DialogManager>().ShowDialogBox("You need a key!", 1, "Ok");
+                    }
                 }
             }
 
-            if (!_doorOpened && objectHit.transform.gameObject.name == "Chest")
+            Debug.Log(_chestOpened + objectHit.transform.gameObject.name);
+            if (!_chestOpened && objectHit.transform.gameObject.name == "Chest")
             {
+                Debug.Log("Got a chest!");
                 if (isMouseClickAction)
                 {
                     _currentActiveObject = objectHit.transform.gameObject;
+                    _currentDialog = DialogType.CHESTOPENED;
+                    PauseGame();
                     dialogBox.GetComponent<DialogManager>().ShowDialogBox("Open?", 2, "Yes", "No");
                 }
             }
-            if (!_doorOpened && objectHit.transform.gameObject.name == "Keycard(Clone)")
+
+            if (!_keyPicked && objectHit.transform.gameObject.name == "Keycard(Clone)")
             {
                 if (isMouseClickAction)
                 {
+                    PauseGame();
+                    _currentDialog = DialogType.KEYPICKED;
                     _currentActiveObject = objectHit.transform.gameObject;
+                    dialogBox.GetComponent<DialogManager>().ShowDialogBox("Take?", 2, "Yes", "No");
                 }
             }
         }
@@ -145,15 +165,22 @@ public class GameBehavior : MonoBehaviour
         return _isGameOnPause;
     }
 
-    public void handleDoalog()
+    public void HandleDialog()
     {
         switch (_currentDialog)
         {
             case DialogType.CHESTOPENED:
+                _currentActiveObject.GetComponent<ChestBehavior>().OpenChest();
+                _chestOpened = true;
+                UnpauseGame();
                 break;
             case DialogType.KEYPICKED:
+                _keyPicked = true;
+                Destroy(_currentActiveObject);
+                UnpauseGame();
                 break;
             case DialogType.DOOROPENED:
+
                 break;
         }
 

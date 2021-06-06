@@ -6,7 +6,6 @@ public class ChestBehavior : MonoBehaviour
 {
     private Animation _animation;
 
-    // Start is called before the first frame update
     void Start()
     {
         this.gameObject.name = "Chest";
