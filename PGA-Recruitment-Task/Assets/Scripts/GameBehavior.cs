@@ -6,11 +6,13 @@ public class GameBehavior : MonoBehaviour
 {
     public Transform wall;
     public List<Transform> wallCells;
+    public GameObject wallCell;
     public GameObject doorFrame;
     public GameObject chest;
     public GameObject keycard;
     public GameObject dialogBox;
-
+    public GameObject player;
+    public GameObject timeManager;
     public Camera cam;
 
     private bool _isGameOnPause;
@@ -27,18 +29,21 @@ public class GameBehavior : MonoBehaviour
     {
         PauseGame();
     }
-    // Start is called before the first frame update
+
+
     public void StartGame()
     {
         UnpauseGame();
         _doorOpened = false;
         _chestOpened = false;
         _keyPicked = false;
+        player.GetComponent<PlayerBehavior>().ResetPlayer();
         InitialiseWallCells();
         RandomlyPlaceDoor();
         RandomlyPlaceChestAndKey();
     }
 
+    //makes list of all walls
     public void InitialiseWallCells()
     {
         wallCells.Clear();
@@ -47,6 +52,8 @@ public class GameBehavior : MonoBehaviour
             wallCells.Add(clild);
         }
     }
+
+    //destroy one random wall and place doo there
     public void RandomlyPlaceDoor()
     {
         int randomIndex = Random.Range(0, wallCells.Count);
@@ -55,19 +62,21 @@ public class GameBehavior : MonoBehaviour
         Instantiate(doorFrame, wallCellInfo.position, wallCellInfo.rotation);
     }
 
+    //spawn chest with key inside
     public void RandomlyPlaceChestAndKey()
     {
         bool hasCollision = true;
         for (int attempt = 0; attempt < 10 && hasCollision; attempt++)
         {
+            //generates coordinates and check for a collision in game scene
             float x = Random.Range(-6f, 6f);
             float z = Random.Range(-6f, 6f);
             Vector3 spawnPosition = new Vector3(x, 0, z);
             Collider[] colliders = Physics.OverlapBox(spawnPosition, new Vector3(0.5f, 0f, 0.5f), Quaternion.identity, LayerMask.GetMask("Props"));
-            Debug.Log(colliders.Length);
             hasCollision = false;
             foreach (Collider col in colliders)
             {
+                //is there are a collision it breaks loop and start new spawn attempt
                 if (col)
                 {
                     hasCollision = true;
@@ -77,6 +86,7 @@ public class GameBehavior : MonoBehaviour
 
             if (!hasCollision)
             {
+                //if z coordinate greater than 0, rotate chest to prevent facing front side of chest to wall
                 if (spawnPosition.z > 0)
                     Instantiate(chest, spawnPosition, Quaternion.Euler(0, 180, 0));
                 else
@@ -119,10 +129,8 @@ public class GameBehavior : MonoBehaviour
                 }
             }
 
-            Debug.Log(_chestOpened + objectHit.transform.gameObject.name);
             if (!_chestOpened && objectHit.transform.gameObject.name == "Chest")
             {
-                Debug.Log("Got a chest!");
                 if (isMouseClickAction)
                 {
                     _currentActiveObject = objectHit.transform.gameObject;
@@ -180,6 +188,25 @@ public class GameBehavior : MonoBehaviour
                 UnpauseGame();
                 break;
             case DialogType.DOOROPENED:
+                //disable in-game ui
+                GameObject.Find("InGameUI").SetActive(false);
+                //stop timer
+                timeManager.GetComponent<TimeManager>().StopCounting();
+                //find game over menu among all game objects and activate
+                GameObject[] objects = Resources.FindObjectsOfTypeAll<GameObject>();
+                foreach (GameObject obj in objects)
+                {
+                    if (obj.name == "GameOverMenu")
+                        obj.SetActive(true);
+
+                }
+                //get refference to door frame
+                GameObject doorFrame = GameObject.Find("DoorFrame(Clone)");
+                //instantiate at point of door frame and make it child of wall
+                Instantiate(wallCell, doorFrame.transform.position, doorFrame.transform.rotation, wall);
+                
+                Destroy(doorFrame);
+                Destroy(GameObject.Find("Chest"));
 
                 break;
         }

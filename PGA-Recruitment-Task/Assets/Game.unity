@@ -7827,11 +7827,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wall: {fileID: 2011284849}
   wallCells: []
+  wallCell: {fileID: 1300367368799226, guid: 37e77a47218919148afc5a8cd332b7c0, type: 3}
   doorFrame: {fileID: 3213729554966942543, guid: cf6a5ae220f6d2445ae1183ac001dd16,
     type: 3}
   chest: {fileID: 1315437350006034, guid: e988d33ef11d97742b81377a806ed01a, type: 3}
   keycard: {fileID: 5493208259516466395, guid: 76b099b2783f2344b99952a5dffa1d0f, type: 3}
   dialogBox: {fileID: 642257551}
+  player: {fileID: 210816817}
   cam: {fileID: 1516947915}
 --- !u!4 &1550004600
 Transform:
@@ -8040,7 +8042,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -97.7}
-  m_SizeDelta: {x: 405.5, y: 86.5}
+  m_SizeDelta: {x: 271.58, y: 52.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1562060420
 MonoBehaviour:
@@ -8084,7 +8086,29 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1562060421}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1433497386}
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1288779018}
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!114 &1562060421
 MonoBehaviour:
   m_ObjectHideFlags: 0
