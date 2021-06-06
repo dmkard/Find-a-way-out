@@ -37,7 +37,9 @@ public class GameBehavior : MonoBehaviour
         _doorOpened = false;
         _chestOpened = false;
         _keyPicked = false;
+        
         player.GetComponent<PlayerBehavior>().ResetPlayer();
+        
         InitialiseWallCells();
         RandomlyPlaceDoor();
         RandomlyPlaceChestAndKey();

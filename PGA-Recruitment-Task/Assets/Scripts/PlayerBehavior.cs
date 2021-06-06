@@ -89,7 +89,8 @@ public class PlayerBehavior : MonoBehaviour
 
     public void ResetPlayer()
     {
-        rb.MovePosition(new Vector3(0, 1.5f, 0));
-        rb.MoveRotation(Quaternion.identity);
+        cam.transform.rotation = Quaternion.identity;
+        gameObject.transform.position = new Vector3(0,1.5f, 0);
+        gameObject.transform.rotation = Quaternion.Euler(0,-90, 0);
     }
 }
