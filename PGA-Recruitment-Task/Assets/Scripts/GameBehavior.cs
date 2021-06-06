@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.InputSystem;
 public class GameBehavior : MonoBehaviour
 {
     public Transform wall;
@@ -10,10 +10,14 @@ public class GameBehavior : MonoBehaviour
     public GameObject chest;
     public GameObject keycard;
 
+    public Camera cam;
+
     private bool _isGameOnPause = false;
     private bool _doorOpened;
     private bool _chestOpened;
     private bool _keyPicked;
+    private GameObject _currentActiveObject;
+
 
     private void Start()
     {
@@ -22,6 +26,8 @@ public class GameBehavior : MonoBehaviour
     // Start is called before the first frame update
     public void StartGame()
     {
+
+        //Cursor.lockState = CursorLockMode.Locked;
         _doorOpened = false;
         _chestOpened = false;
         _keyPicked = false;
@@ -45,46 +51,73 @@ public class GameBehavior : MonoBehaviour
         Destroy(wallCells[randomIndex].gameObject);
         Instantiate(doorFrame, wallCellInfo.position, wallCellInfo.rotation);
     }
+
     public void RandomlyPlaceChestAndKey()
     {
         bool hasCollision = true;
-        
-        for(int attempt = 0; attempt < 10 && hasCollision; attempt++)
+        for (int attempt = 0; attempt < 10 && hasCollision; attempt++)
         {
-            Debug.Log(attempt);
-            float x = Random.Range(7.5f, 7.5f);
-            float z = Random.Range(7.5f, 7.5f);
+            float x = Random.Range(-6f, 6f);
+            float z = Random.Range(-6f, 6f);
             Vector3 spawnPosition = new Vector3(x, 0, z);
-            Collider[] colliders = Physics.OverlapBox(spawnPosition, new Vector3(0.4f, 0.4f, 0.4f), Quaternion.identity, LayerMask.GetMask("Props"));
-
+            Collider[] colliders = Physics.OverlapBox(spawnPosition, new Vector3(0.5f, 0f, 0.5f), Quaternion.identity, LayerMask.GetMask("Props"));
+            Debug.Log(colliders.Length);
             hasCollision = false;
             foreach (Collider col in colliders)
             {
-                if(col)
+                if (col)
                 {
                     hasCollision = true;
                     break;
                 }
             }
 
-            if(!hasCollision)
+            if (!hasCollision)
             {
-                Instantiate(chest, new Vector3(4.5f, 0 , 4.5f), Quaternion.identity);
+                Instantiate(chest, spawnPosition, Quaternion.identity);
+                Instantiate(keycard, spawnPosition + new Vector3(0f, 0.15f, 0f), Quaternion.Euler(-90,90,0));
             }
         }
-        
-
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        if(!_isGameOnPause)
+            CastRay();
     }
 
     public void CastRay(bool isMouseClickAction = false)
     {
-         
+        RaycastHit objectHit;
+        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
+        Physics.Raycast(ray, out objectHit);
+
+        if(objectHit.distance < 2)
+        {
+            if (!_doorOpened && objectHit.transform.gameObject.name == "Door")
+            {
+                if (isMouseClickAction)
+                {
+                    _currentActiveObject = objectHit.transform.gameObject;
+                }
+            }
+
+            if (!_doorOpened && objectHit.transform.gameObject.name == "Chest")
+            {
+                if (isMouseClickAction)
+                {
+                    _currentActiveObject = objectHit.transform.gameObject;
+                }
+            }
+            if (!_doorOpened && objectHit.transform.gameObject.name == "Keycard(Clone)")
+            {
+                if (isMouseClickAction)
+                {
+                    _currentActiveObject = objectHit.transform.gameObject;
+                }
+            }
+        }
     }
 
 
